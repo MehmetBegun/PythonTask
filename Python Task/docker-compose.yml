@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: interpol
+      POSTGRES_USER: interpol_user
+      POSTGRES_PASSWORD: interpol_pass
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  scraper:
+    build: ./scraper
+    volumes:
+      - ./sayfa_1.html:/data/sayfa_1.html
+      - ./sayfa_2.html:/data/sayfa_2.html
+      - ./sayfa_3.html:/data/sayfa_3.html
+      - ./sayfa_4.html:/data/sayfa_4.html
+      - ./sayfa_5.html:/data/sayfa_5.html
+      - ./sayfa_6.html:/data/sayfa_6.html
+      - ./sayfa_7.html:/data/sayfa_7.html
+      - ./sayfa_8.html:/data/sayfa_8.html
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_QUEUE=interpol_queue
+      - SCRAPE_INTERVAL=60
+    depends_on:
+      - rabbitmq
+
+  web:
+    build: ./web
+    ports:
+      - "8501:8501"
+    environment:
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_QUEUE=interpol_queue
+      - DB_TYPE=postgres
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=interpol
+      - POSTGRES_USER=interpol_user
+      - POSTGRES_PASSWORD=interpol_pass
+    depends_on:
+      - rabbitmq
+      - postgres
+
+volumes:
+  pgdata: 

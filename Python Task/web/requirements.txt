@@ -1,0 +1,5 @@
+pika
+streamlit
+pandas
+streamlit-autorefresh
+psycopg2-binary 

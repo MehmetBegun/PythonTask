@@ -1,0 +1,5 @@
+selenium==4.18.1
+requests==2.31.0
+reportlab==4.1.0
+pandas==2.2.1
+webdriver-manager==4.0.1 
