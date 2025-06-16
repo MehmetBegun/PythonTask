@@ -1,8 +1,12 @@
+import os
 import requests
 import time
 import json
 
-BASE_URL = "https://ws-public.interpol.int/notices/v1/red"
+# Base URL optionally overridable to support different endpoints, e.g.
+# https://interpol.api.bund.dev
+BASE_URL = os.getenv("INTERPOL_BASE_URL", "https://ws-public.interpol.int/notices/v1/red")
+API_KEY = os.getenv("INTERPOL_API_KEY")
 RESULTS_PER_PAGE = 160  # Sayfa başına maksimum sonuç sayısı
 
 headers = {
@@ -10,6 +14,10 @@ headers = {
     "Accept": "application/json, text/plain, */*",
     "Referer": "https://www.interpol.int/",
 }
+
+if API_KEY:
+    # Custom API endpoints may require an API key for authentication
+    headers["x-api-key"] = API_KEY
 
 def extract_red_notice_data(notice):
     """

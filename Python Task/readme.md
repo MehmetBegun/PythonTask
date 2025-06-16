@@ -59,6 +59,18 @@ Bu proje, Interpol tarafından yayınlanan kırmızı bülten (Red Notice) veril
 - Projeyi Github/Gitlab'a yükleyerek versiyon kontrolü sağlayabilirsiniz.
 - Gelişmiş mimari için kodlar kolayca genişletilebilir.
 
+## Bund.dev API Entegrasyonu
+Projede istenirse Interpol verileri `https://interpol.api.bund.dev/` adresindeki
+REST API kullanılarak da çekilebilir. Bunun için `interpol_full_scrape.py`
+dosyasındaki `INTERPOL_BASE_URL` ve `INTERPOL_API_KEY` ortam değişkenleri
+kullanılır. API anahtarınızı `INTERPOL_API_KEY` olarak tanımlayıp scripti
+aşağıdaki gibi çalıştırabilirsiniz:
+
+```bash
+INTERPOL_BASE_URL=https://interpol.api.bund.dev \
+INTERPOL_API_KEY=<your-key> python interpol_full_scrape.py
+```
+
 ---
 
 **Not:** Eksik veya geliştirilmesi gereken noktalar README'de ve kodda açıklanmıştır. Daha fazla bilgi için PDF görev dosyasına bakınız. 
