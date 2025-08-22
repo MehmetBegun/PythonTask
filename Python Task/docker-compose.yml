@@ -1,0 +1,66 @@
+services:
+  container_a:
+    build:
+      context: ./ContainerA/
+      dockerfile: Dockerfile
+    image: container_a:latest
+    command: ["python", "scraper.py"]
+    env_file:
+      - .env
+    environment:
+      INTERVAL: ${INTERVAL:-300}
+      RABBITMQ_HOST: ${RABBITMQ_HOST:-container_c}
+      RABBITMQ_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_PASS: ${RABBITMQ_PASS:-guest}
+    depends_on:
+      - container_c
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s=socket.socket(); s.settimeout(2); s.connect(('container_c',5672)); print('ok')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  container_b:
+    build:
+      context: ./ContainerB/
+      dockerfile: Dockerfile
+    image: container_b:latest
+    ports:
+      - "8080:5000"
+    env_file:
+      - .env
+    environment:
+      DB_HOST: ${DB_HOST:-127.0.0.1}
+      DB_NAME: ${DB_NAME:-postgres_db}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_PORT: ${DB_PORT:-5432}
+    depends_on:
+      - container_a
+      - container_c
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000', timeout=3); print('ok')"]
+    volumes:
+      - pgdata:/var/lib/postgresql
+
+  container_c:
+    image: rabbitmq:3-management
+    env_file:
+      - .env
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS:-guest}
+    restart: always
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  pgdata:
