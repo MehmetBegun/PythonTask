@@ -1,9 +1,9 @@
-## Interpol Red Notices — 3 Konteynerli Python/Docker Uygulaması
+## 3 Konteynerli Python/Docker Uygulaması
 
-Bu proje, INTERPOL Kırmızı Bülten verisini periyodik olarak çekip bir mesaj kuyruğuna (RabbitMQ) yazar; tüketici bir servis bu veriyi veritabanına kaydeder ve Flask tabanlı bir web arayüzünde listeler. Mimari 3 konteynerden oluşur ve `docker-compose` ile çalıştırılır.
+Bu proje, verileri periyodik olarak çekip bir mesaj kuyruğuna (RabbitMQ) yazar; tüketici bir servis bu veriyi veritabanına kaydeder ve Flask tabanlı bir web arayüzünde listeler. Mimari 3 konteynerden oluşur ve `docker-compose` ile çalıştırılır.
 
 ### Mimarî genel bakış
-- Container A (Scraper/Producer): INTERPOL API’den veriyi belirli aralıklarla çeker, RabbitMQ’ya yollar.
+- Container A (Scraper/Producer): API’den veriyi belirli aralıklarla çeker, RabbitMQ’ya yollar.
 - Container B (Consumer + Web + DB başlatma): RabbitMQ kuyruğunu dinler, veriyi PostgreSQL’e yazar ve Flask ile HTML arayüzde gösterir.
 - Container C (Queue): RabbitMQ (yönetim paneli dahildir).
 
@@ -74,7 +74,7 @@ Not: `ContainerB` içinde PostgreSQL servisleri başlatılır ve tablo otomatik 
 Mevcut durumda kodun bazı bölümleri varsayılan değerleri sabit kullanmaktadır (örn. `container_c`, `localhost`). `docker-compose.yml` .env değerlerini iletir; ilerleyen sürümlerde tüm bileşenler bu değişkenleri doğrudan koddan da okuyacak şekilde genişletilecektir.
 
 ### Veritabanı
-Oluşan tablo: `interpol_rednotices`
+Oluşan tablo: ``
 - id SERIAL PRIMARY KEY
 - entity_id VARCHAR(128) UNIQUE
 - name_surname VARCHAR(200)
@@ -94,4 +94,5 @@ Oluşan tablo: `interpol_rednotices`
 
 ### Geliştirme ipuçları
 - Loglar için: `docker compose logs -f container_a` (scraper), `container_b`, `container_c`.
+
 - Servisleri durdurma: `docker compose down`.
